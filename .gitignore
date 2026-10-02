@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.data/
+knowledge/private/
+baseline/
+artifacts/
+*.log
+.DS_Store
+dist/
+FishFlavorDemo.exe
