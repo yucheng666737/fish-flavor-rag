@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>風味知識問答 · 鱸魚精 RAG</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/rag.css">
+    <script src="js/rag-client.js" defer></script>
+    <script src="js/rag-page.js" defer></script>
+</head>
+<body>
+    <main class="rag-page">
+        <a href="index.html">← 回到風味設計體驗</a>
+        <p class="rag-eyebrow">FISH FLAVOR KNOWLEDGE</p>
+        <h1>風味知識問答</h1>
+        <p>從風味知識中整理搭配靈感，探索食材的特色與飲用方式。</p>
+        <p id="ragStatus" class="rag-status" role="status">正在檢查知識庫狀態…</p>
+        <form id="ragForm" class="rag-panel">
+            <label for="ragQuery">想了解哪一種搭配？</label>
+            <textarea id="ragQuery" maxlength="500" rows="3" required placeholder="例如：檸檬和蜂蜜如何搭配？"></textarea>
+            <div class="rag-examples">
+                <button type="button" data-question="檸檬和蜂蜜的風味特色與搭配方式是什麼？">檸檬 × 蜂蜜</button>
+                <button type="button" data-question="配方的基底比例是多少？最多能加入幾次風味？">配方比例</button>
+                <button type="button" data-question="資料是否能證明這個配方可以治療疾病？">文件的限制</button>
+            </div>
+            <button id="askButton" type="submit" class="btn-primary">查詢知識文件</button>
+        </form>
+        <section id="ragResult" class="rag-panel" aria-live="polite"><p>您的風味問答會顯示在這裡。</p></section>
+        <p class="rag-footnote">知識庫收錄 12 種風味設計資料、鱸魚精基底、配方規則，以及營養與飲用參考。內容不是本配方的實際營養檢測、商品配方或醫療建議。</p>
+    </main>
+</body>
+</html>

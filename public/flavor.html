@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>調整風味 - 鱸魚精設計體驗</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- 添加Font Awesome圖標庫 -->
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="css/rag.css">
+</head>
+<body class="flavor-page">
+    <aside class="rag-banner"><a href="rag.html">風味知識問答</a> · 風味設計展示，非營養檢測或醫療建議。</aside>
+    <!-- 背景动画元素 -->
+    <div class="animated-bg">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+    
+    <div class="container">
+        <h1 class="page-title">調整風味</h1>
+        <p class="identity-info">您選擇的身份：<span id="selectedIdentity">未選擇</span></p>
+        
+        <!-- 新增基底風味提示 -->
+        <div class="base-flavor-notification">
+            <h2>基底風味: 鱸魚精 (50%)</h2>
+            <p>您可以再添加風味元素，總配方不超過100%</p>
+        </div>
+        
+        <div class="flavor-content">
+            <div class="design-area">
+                <h2>設計區</h2>
+                <div id="designContainer" class="design-container">
+                    <div class="bottle-container">
+                        <div class="bottle">
+                            <div class="bottle-liquid"></div>
+                            <div class="bottle-label"></div>
+                            <!-- 添加瓶身標籤元素 -->
+                            <div class="bottle-title">FISH SOUP</div>
+                            <div class="bottle-icon">
+                                <i class="fas fa-fish"></i>
+                            </div>
+                            <div class="bottle-select-button">
+                                <span>SELECT</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flavor-stats">
+                        <div class="stat-bar">
+                            <span>口感完整度：</span>
+                            <div class="progress">
+                                <div id="completeness" style="width: 50%;">50%</div>
+                            </div>
+                        </div>
+                        <div class="stats-header">
+                            <h3>已選成分</h3>
+                            <button id="clearAllElements" class="clear-btn" title="清空所有成分">清空所有</button>
+                        </div>
+                        <div id="flavorStats" class="flavor-details">
+                            <!-- 這裡會動態填入調味成分資訊 --> 
+                            <div class="flavor-item base-flavor">
+                                <span class="flavor-name">鱸魚精 (基底)</span>
+                                <span class="flavor-percentage">50%</span>
+                                <!-- 基底風味不可刪除 -->
+                            </div>
+                        </div>
+                    </div>
+                    <div id="personalizedTips" class="personalized-tips">
+                        <!-- 這裡會顯示根據身份提供的個性化建議 -->
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button id="backToIdentity" class="btn-secondary">返回身份選擇</button>
+                    <button id="generateReport" class="btn-primary">生成報告</button>
+                </div>
+            </div>
+            
+            <div class="elements-library">
+                <h2>風味元素庫</h2>
+                <div class="elements-container">
+                    <div class="element-item" draggable="true" data-element="lemon" data-flavor="清新">
+                        <div class="element-icon">
+                            <img src="images/flavors/lemon.ico" alt="檸檬" class="flavor-img">
+                        </div>
+                        <span>檸檬</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="honey" data-flavor="甘甜">
+                        <div class="element-icon">
+                            <img src="images/flavors/honey.ico" alt="蜂蜜" class="flavor-img">                     
+                        </div>
+                        <span>蜂蜜</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="ginger" data-flavor="濃郁">
+                        <div class="element-icon">
+                            <img src="images/flavors/ginger.ico" alt="薑汁" class="flavor-img">
+                        </div>
+                        <span>薑汁</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="lavender" data-flavor="天然">
+                        <div class="element-icon">
+                            <img src="images/flavors/lavender.ico" alt="薰衣草" class="flavor-img">
+                        </div>
+                        <span>薰衣草</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="mint" data-flavor="持久">
+                        <div class="element-icon">
+                            <img src="images/flavors/mint.ico" alt="薄荷" class="flavor-img">
+                        </div>
+                        <span>薄荷</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="vanilla" data-flavor="甘甜">
+                        <div class="element-icon">
+                            <img src="images/flavors/vanilla.ico" alt="香草" class="flavor-img">
+                        </div>
+                        <span>香草</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="cinnamon" data-flavor="濃郁">
+                        <div class="element-icon">
+                            <img src="images/flavors/cinnamon.ico" alt="肉桂" class="flavor-img">
+                        </div>
+                        <span>肉桂</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="orange" data-flavor="清新">
+                        <div class="element-icon">
+                            <img src="images/flavors/orange.ico" alt="柳橙" class="flavor-img">
+                        </div>
+                        <span>柳橙</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="rose" data-flavor="天然">
+                        <div class="element-icon">
+                            <img src="images/flavors/rose.ico" alt="玫瑰" class="flavor-img">
+                        </div>
+                        <span>玫瑰</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="chamomile" data-flavor="持久">
+                        <div class="element-icon">
+                            <img src="images/flavors/chamomile.ico" alt="洋甘菊" class="flavor-img">
+                        </div>
+                        <span>洋甘菊</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="cranberry" data-flavor="清新">
+                        <div class="element-icon">
+                            <img src="images/flavors/cranberry.ico" alt="蔓越莓" class="flavor-img">
+                        </div>
+                        <span>蔓越莓</span>
+                    </div>
+                    <div class="element-item" draggable="true" data-element="goji" data-flavor="天然">
+                        <div class="element-icon">
+                            <img src="images/flavors/goji.ico" alt="枸杞" class="flavor-img">
+                        </div>
+                        <span>枸杞</span>
+                    </div>
+                </div>
+                
+                <!-- 風味分類標籤 -->
+                <div class="flavor-categories">
+                    <h3></h3>
+                    <div class="category-tags">
+                        <div class="category-tag">
+                            中藥養生
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-tag">
+                            冷泡風味
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-tag">
+                            創意混搭
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-tag">
+                            功能性配方
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-tag">
+                            品牌概念風味
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-tag">
+                            國際風味
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-tag">
+                            水果風味
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-tag">
+                            茶系風味
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-tag">
+                            草本香料
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-tag">
+                            濃郁風味
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 装饰元素 -->
+    <div class="decorative-elements">
+        <div class="leaf-decoration left"></div>
+        <div class="leaf-decoration right"></div>
+        <div class="water-drop"></div>
+    </div>
+    
+    <script src="js/rag-client.js"></script>
+    <script src="js/flavor.js"></script>
+</body>
+</html> 

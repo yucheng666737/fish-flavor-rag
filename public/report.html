@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配方報告 - 鱸魚精設計體驗</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <script src="/vendor/chart/chart.umd.js"></script>
+    <link rel="stylesheet" href="css/rag.css">
+</head>
+<body class="report-page">
+    <aside class="rag-banner"><a href="rag.html">風味知識問答</a> · 風味設計展示，非營養檢測或醫療建議。</aside>
+    <!-- 背景动画元素 -->
+    <div class="animated-bg">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+    
+    <div class="container">
+        <h1 class="page-title">您的個人化鱸魚精設計報告</h1>
+        <p class="identity-info">身份：<span id="reportIdentity">未選擇</span></p>
+        
+        <div class="report-content">
+            <div class="report-section taste-profile">
+                <h2>專屬風味建議</h2>
+                <div class="taste-profile-container">
+                    <div class="bottle-preview">
+                        <div id="reportBottle" class="bottle">
+                            <div class="bottle-liquid"></div>
+                            <div class="bottle-icon">
+                                <i class="fas fa-fish"></i>
+                            </div>
+                            <div class="bottle-title">FISH SOUP</div>
+                            <div class="bottle-select-button">
+                                <span>SELECT</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="taste-description-wrapper">
+                        <div id="tasteDescription" class="taste-description glass-card">
+                            <!-- 動態生成的專屬風味建議 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-section flavor-radar">
+                <h2>風味分析</h2>
+                <div class="radar-chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="radar-legend">
+                    <div class="legend-item">
+                        <span class="legend-color freshness"></span>
+                        <span class="legend-text">清新感</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color richness"></span>
+                        <span class="legend-text">濃郁度</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color sweetness"></span>
+                        <span class="legend-text">甘甜度</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color naturalness"></span>
+                        <span class="legend-text">天然感</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color aftertaste"></span>
+                        <span class="legend-text">後韻持久度</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-section nutrition-analysis">
+                <h2>配方設計比例</h2>
+                <div class="nutrition-chart-container">
+                    <canvas id="nutritionChart"></canvas>
+                </div>
+                <div id="nutritionDetails" class="nutrition-details">
+                    <!-- 動態生成的營養成分詳情 -->
+                </div>
+            </div>
+            
+            <div class="report-section usage-suggestions">
+                <h2>營養元素參考</h2>
+                <p class="report-reference-note">依所選食材整理公開營養資料。數值標示原料形式與參考單位，非本配方實測值。</p>
+                <div id="nutritionReference" class="rag-panel report-knowledge" aria-live="polite">
+                    正在準備您的營養元素參考…
+                </div>
+            </div>
+
+            <div class="report-section usage-suggestions">
+                <h2>飲用建議</h2>
+                <div id="usageSuggestions" class="rag-panel report-knowledge" aria-live="polite">
+                    正在準備飲用與保存建議…
+                </div>
+            </div>
+        </div>
+        
+        <div class="navigation-buttons">
+            <button id="backToFlavor" class="btn-secondary">返回調整</button>
+            <button id="finishExperience" class="btn-primary">完成體驗</button>
+        </div>
+    </div>
+    
+    <!-- 装饰元素 -->
+    <div class="decorative-elements">
+        <div class="leaf-decoration left"></div>
+        <div class="leaf-decoration right"></div>
+        <div class="water-drop"></div>
+    </div>
+    
+    <script src="js/rag-client.js"></script>
+    <script src="js/recipe-model.js"></script>
+    <script src="js/report-cache.js"></script>
+    <script src="js/report-rag.js"></script>
+</body>
+</html> 

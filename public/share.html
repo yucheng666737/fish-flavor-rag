@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分享您的設計 - 鱸魚精設計體驗</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta property="og:title" content="我的專屬健康配方" />
+    <meta property="og:description" content="我在「鱸魚精設計體驗」創造了專屬配方，快來體驗吧！" />
+    <meta property="og:image" content="images/share-preview.jpg" />
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="css/rag.css">
+</head>
+<body class="share-page">
+    <aside class="rag-banner"><a href="rag.html">風味知識問答</a> · 風味設計展示，非營養檢測或醫療建議。</aside>
+    <!-- 背景动画元素 -->
+    <div class="animated-bg">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+    
+    <div class="container">
+        <div class="share-content">
+            <h1 class="main-title">您的鱸魚精設計體驗完成</h1>
+            <p class="subtitle">感謝您參與鱸魚精設計體驗，與朋友分享您的專屬配方吧！</p>
+            
+            <div class="share-preview">
+                <div class="product-preview">
+                    <div id="shareBottle" class="bottle">
+                        <div class="bottle-liquid"></div>
+                        <div class="bottle-icon">
+                            <i class="fas fa-fish"></i>
+                        </div>
+                        <div class="bottle-title">FISH SOUP</div>
+                        <div class="bottle-select-button">
+                            <span>SELECT</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="share-details">
+                    <h2>您的專屬配方</h2>
+                    <div id="shareRecipe" class="recipe-content">
+                        <!-- 動態生成的配方內容 -->
+                    </div>
+                    
+                    <div class="share-tags">
+                        <h3>分享標籤</h3>
+                        <div id="tagContainer" class="tag-container">
+                            <!-- 動態生成的標籤 -->
+                        </div>
+                    </div>
+                    
+                    <div class="share-message">
+                        <h3>分享文案</h3>
+                        <div id="shareMessageContent" class="share-message-content">
+                            <!-- 動態生成的分享文案 -->
+                        </div>
+                        <button id="copyMessage" class="copy-btn">複製文案</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="social-sharing">
+                <h2>選擇分享平台</h2>
+                <div class="share-buttons">
+                    <button id="shareFacebook" class="share-btn facebook">
+                        <i class="fab fa-facebook-f"></i>
+                        Facebook
+                    </button>
+                    <button id="shareInstagram" class="share-btn instagram">
+                        <i class="fab fa-instagram"></i>
+                        Instagram
+                    </button>
+                    <button id="shareLine" class="share-btn line">
+                        <i class="fab fa-line"></i>
+                        LINE
+                    </button>
+                </div>
+            </div>
+            
+            <div class="promotion-section">
+                <h2>專屬優惠</h2>
+                <div class="promotion-card">
+                    <div class="promotion-content">
+                        <h3>限時折扣</h3>
+                        <p>分享此頁面至任一社群媒體，即可獲得專屬折扣碼，享85折優惠！</p>
+                        <div class="code-container">
+                            <span id="promoCode" class="promo-code">點擊分享按鈕後顯示</span>
+                            <button id="copyCode" class="copy-btn" disabled>複製</button>
+                        </div>
+                        <p class="promo-details">優惠期限至2025年6月15日，不得與其他優惠同時使用</p>
+                    </div>
+                </div>
+                
+                <div class="promotion-card">
+                    <div class="promotion-content">
+                        <h3>抽獎活動</h3>
+                        <p>點擊參加抽獎後填寫問卷，即可參加月度抽獎活動，許多好禮等著您！</p>
+                        <div id="lotteryNumber" class="lottery-number">您的抽獎編號：<span>點擊分享按鈕後顯示</span></div>
+                        <button id="joinLottery" class="btn-secondary" disabled>參加抽獎</button>
+                        <p class="lottery-details">下次抽獎日期：2025年6月15日</p>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="navigation-buttons">
+                <button id="backToReport" class="btn-secondary">返回報告</button>
+                <button id="buyNow" class="btn-primary">立即購買</button>
+                <button id="backToHome" class="btn-secondary">回到首頁</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 装饰元素 -->
+    <div class="decorative-elements">
+        <div class="leaf-decoration left"></div>
+        <div class="leaf-decoration right"></div>
+        <div class="water-drop"></div>
+    </div>
+    
+    <script src="js/share.js"></script>
+</body>
+</html> 
