@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: fish-flavor-interview
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev --ignore-scripts
+    startCommand: node hosted.js
+    healthCheckPath: /livez
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: RAG_STORE
+        value: pinecone
+      - key: DEMO_PASSWORD
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PINECONE_API_KEY
+        sync: false

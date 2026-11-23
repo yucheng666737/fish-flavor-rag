@@ -13,9 +13,10 @@ function createApp(config, provider) {
       'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer',
       'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'",
     });
-    const allowed = new Set([`localhost:${req.socket.localPort}`, `127.0.0.1:${req.socket.localPort}`]);
+    const allowed = config.publicOrigin ? new Set([new URL(config.publicOrigin).host]) : new Set([`localhost:${req.socket.localPort}`, `127.0.0.1:${req.socket.localPort}`]);
     if (!allowed.has(req.headers.host)) return next(new AppError('INVALID_HOST', '本機服務不接受此主機名稱。', 403));
-    if (req.headers.origin && !new Set([...allowed].map(h => `http://${h}`)).has(req.headers.origin)) return next(new AppError('INVALID_ORIGIN', '不接受跨網站請求。', 403));
+    const origins = config.publicOrigin ? [config.publicOrigin] : [...allowed].map(h => `http://${h}`);
+    if (req.headers.origin && !origins.includes(req.headers.origin)) return next(new AppError('INVALID_ORIGIN', '不接受跨網站請求。', 403));
     if (req.headers['sec-fetch-site'] === 'cross-site') return next(new AppError('INVALID_ORIGIN', '不接受跨網站請求。', 403));
     next();
   });
