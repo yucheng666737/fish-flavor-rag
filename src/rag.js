@@ -87,7 +87,7 @@ async function answerQuestion(config, provider, question, options) {
     sources: contexts.filter(c => used.has(c.id)).map(c => ({ id: c.id, title: c.title, file: c.source, chunk: c.chunk, excerpt: c.text, score: Number(c.score.toFixed(4)) })),
     retrieved_count: contexts.length,
     models: { embedding: config.embeddingModel, generation: options?.extractiveNutrition ? null : config.chatModel },
-    answer_mode: options?.extractiveNutrition ? 'retrieved_reference' : 'generated',
+    answer_mode: options?.extractiveNutrition ? 'retrieved_reference' : 'selected_evidence',
   };
 }
 module.exports = { answerQuestion, validateQuery, validateAnswer, recommendationQuery, recommendationSources };

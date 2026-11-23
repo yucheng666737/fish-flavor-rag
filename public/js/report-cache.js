@@ -1,6 +1,6 @@
 'use strict';
 (function (root) {
-    const storageKey = 'fishRagReport.v2';
+    const storageKey = 'fishRagReport.v3';
     function create(storage, identity, elements) {
         // Sorting preserves duplicates (and thus ratios) while ignoring drag order.
         const key = JSON.stringify([identity, [...elements].sort()]);

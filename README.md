@@ -114,7 +114,7 @@ npm.cmd run verify:live
 
 報告頁同一路由可帶 `section: "nutrition"` 或 `"usage"`（預設 `"flavor"`）。後端依已選食材限制營養／飲用文件範圍，再做向量檢索；不接受客戶端指定文件路徑。分區檢索依文件數提高回傳片段數，最多 8 片，避免六種食材時被預設 Top 5 截斷；相似度門檻仍保留。三個區塊依序請求，各有獨立的來源及錯誤狀態。營養資訊保留原料形式、每100克或每100毫升及參考品牌，不會用拖曳比例估算每份含量。
 
-營養區塊使用真實向量檢索後，逐字呈現文件內已查核的「呈現摘要」，不呼叫生成模型改寫數字或添加功效。API 回傳 `answer_mode: "retrieved_reference"`、`models.generation: null`；風味與飲用仍由模型整理，回傳 `answer_mode: "generated"`。這個區分避免將檢索摘要宣稱為 AI 生成內容。
+營養區塊使用真實向量檢索後，逐字呈現文件內已查核的「呈現摘要」，不呼叫生成模型改寫數字或添加功效。API 回傳 `answer_mode: "retrieved_reference"`、`models.generation: null`；風味與飲用問答由模型挑選可直接回答問題的原文編號，後端依編號取回原文與引用，回傳 `answer_mode: "selected_evidence"`。模型未選出證據時會回覆資料不足。
 
 `/api/health` 的 ready 代表索引與本機設定已就緒，**不代表 API 金鑰、帳務或模型已經即時驗證成功**；以實際問答或 `verify:live` 為準。
 

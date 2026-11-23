@@ -285,17 +285,18 @@ test('OpenAI adapter uses a fixed host, bearer header and structured output', as
   const provider = createOpenAI(config, async (url, init) => {
     requests.push({ url, ...init });
     if (url.endsWith('/embeddings')) return Response.json({ data: [{ index: 0, embedding: [1, 2] }] });
-    return Response.json({ choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ answer: '答案', citation_ids: ['a'], recommended_elements: [], insufficient_evidence: false }) } }] });
+    return Response.json({ choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ passages: ['1'], answer: '適合甜點' }) } }] });
   });
   await provider.embed(['檸檬']);
-  await provider.generate('檸檬？', [{ id: 'a', title: '檸檬', source: 'lemon.md', text: '風味' }]);
+  const grounded = await provider.generate('檸檬？', [{ id: 'a', title: '檸檬', source: 'lemon.md', text: '風味' }]);
+  assert.equal(grounded.answer, '風味。');
+  assert.deepEqual(grounded.citation_ids, ['a']);
   assert.equal(requests[0].url, 'https://api.openai.com/v1/embeddings');
   assert.equal(requests[0].headers.Authorization, 'Bearer sentinel-secret-not-real');
   assert.equal(requests[0].redirect, 'error');
   const body = JSON.parse(requests[1].body);
   assert.equal(body.response_format.json_schema.strict, true);
-  assert.deepEqual(body.response_format.json_schema.schema.properties.citation_ids.items.enum, ['a']);
-  assert.deepEqual(body.response_format.json_schema.schema.properties.recommended_elements.items.properties.citation_ids.items.enum, ['a']);
+  assert.deepEqual(body.response_format.json_schema.schema.properties.passages.items.enum, ['1']);
   assert.equal(body.store, false);
   assert.equal(requests[1].body.includes(config.apiKey), false);
 });
@@ -308,6 +309,17 @@ test('provider refuses missing key, malformed embeddings, refusal and truncation
   await assert.rejects(createOpenAI(loadConfig({}), () => { throw new Error('Must not fetch'); }).embed(['a']), { code: 'MISSING_API_KEY' });
   const config = { ...loadConfig({}), apiKey: 'test-only' };
   await assert.rejects(createOpenAI(config, async () => Response.json({ data: [] })).embed(['a']), { code: 'INVALID_EMBEDDING' });
-  await assert.rejects(createOpenAI(config, async () => Response.json({ choices: [{ message: { refusal: 'no' }, finish_reason: 'stop' }] })).generate('a', []), { code: 'MODEL_REFUSAL' });
-  await assert.rejects(createOpenAI(config, async () => Response.json({ choices: [{ message: { content: '{}' }, finish_reason: 'length' }] })).generate('a', []), { code: 'INCOMPLETE_ANSWER' });
+  await assert.rejects(createOpenAI(config, async () => Response.json({ choices: [{ message: { refusal: 'no' }, finish_reason: 'stop' }] })).generate('a', [{ id: 'a', source: 'a.md', text: '風味' }]), { code: 'MODEL_REFUSAL' });
+  await assert.rejects(createOpenAI(config, async () => Response.json({ choices: [{ message: { content: '{}' }, finish_reason: 'length' }] })).generate('a', [{ id: 'a', source: 'a.md', text: '風味' }]), { code: 'INCOMPLETE_ANSWER' });
+});
+
+test('unanswerable requests abstain and unknown passage keys fail closed', async () => {
+  const contexts = [{ id: 'm', title: '薄荷', source: 'mint.md', text: '## 搭配方向\n檸檬搭配薄荷偏清新草本方向；柳橙搭配薄荷偏柑橘草本方向。' }];
+  const ask = passages => createOpenAI({ ...loadConfig({}), apiKey: 'test-only' }, async () => Response.json({
+    choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ passages }) } }],
+  })).generate('檸檬和薄荷搭配後是什麼風味？', contexts);
+  assert.equal((await ask(['1'])).answer, '檸檬搭配薄荷偏清新草本方向。');
+  assert.deepEqual((await ask([])).citation_ids, []);
+  assert.equal((await ask([])).insufficient_evidence, true);
+  await assert.rejects(ask(['3']), { code: 'INVALID_ANSWER' });
 });
