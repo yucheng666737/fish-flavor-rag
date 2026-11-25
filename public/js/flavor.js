@@ -144,50 +144,72 @@ function initDragAndDrop() {
     let autoScrollInterval = null;
     const scrollSpeed = 8; // 滾動速度
     
-    // 為每個元素添加拖拽事件
+    let activeTouch = null;
+
+    function clearTouchDrag() {
+        if (!activeTouch) return;
+        activeTouch.preview?.remove();
+        activeTouch.item.classList.remove('dragging');
+        activeTouch = null;
+        designContainer.classList.remove('drag-over');
+        stopAutoScroll();
+    }
+
+    window.addEventListener('blur', clearTouchDrag);
+    window.addEventListener('pagehide', clearTouchDrag);
+
     elementItems.forEach(item => {
-        // 觸摸事件處理（移動裝置）
-        item.addEventListener('touchstart', function(e) {
-            this.classList.add('dragging');
-            startAutoScrollCheck(e);
+        item.addEventListener('touchstart', e => {
+            if (activeTouch || e.touches.length !== 1) return;
+            e.preventDefault();
+            activeTouch = { item, id: e.changedTouches[0].identifier, preview: null };
         }, { passive: false });
-        
-        item.addEventListener('touchmove', function(e) {
-            e.preventDefault(); // 防止頁面隨手指移動
-            updateAutoScroll(e);
-            simulateDragPosition(e);
-        }, { passive: false });
-        
-        item.addEventListener('touchend', function(e) {
-            this.classList.remove('dragging');
-            stopAutoScroll();
-            const dropTarget = document.elementFromPoint(
-                e.changedTouches[0].clientX,
-                e.changedTouches[0].clientY
-            );
-            
-            // 檢查是否放置在設計容器內
-            if (dropTarget && (dropTarget.id === 'designContainer' || dropTarget.closest('#designContainer'))) {
-                const elementName = this.getAttribute('data-element');
-                const flavorType = this.getAttribute('data-flavor');
-                const elementText = this.querySelector('span').textContent;
-                
-                // 手動觸發放置處理
-                handleElementDrop(elementName, flavorType, elementText);
+
+        item.addEventListener('touchmove', e => {
+            if (activeTouch?.item !== item) return;
+            const touch = Array.from(e.changedTouches).find(t => t.identifier === activeTouch.id);
+            if (!touch) return;
+            e.preventDefault();
+            if (!activeTouch.preview) {
+                const preview = item.cloneNode(true);
+                preview.classList.add('drag-preview');
+                preview.setAttribute('aria-hidden', 'true');
+                preview.style.width = item.getBoundingClientRect().width + 'px';
+                document.body.appendChild(preview);
+                activeTouch.preview = preview;
+                item.classList.add('dragging');
             }
+            activeTouch.preview.style.left = touch.clientX + 'px';
+            activeTouch.preview.style.top = touch.clientY + 'px';
+            updateAutoScroll(touch);
+            designContainer.classList.toggle('drag-over',
+                designContainer.contains(document.elementFromPoint(touch.clientX, touch.clientY)));
+        }, { passive: false });
+
+        item.addEventListener('touchend', e => {
+            if (activeTouch?.item !== item) return;
+            const touch = Array.from(e.changedTouches).find(t => t.identifier === activeTouch.id);
+            if (!touch) return;
+            const add = activeTouch.preview && designContainer.contains(document.elementFromPoint(touch.clientX, touch.clientY));
+            clearTouchDrag();
+            if (add) handleElementDrop(item.dataset.element, item.dataset.flavor, item.querySelector('span').textContent);
         });
-        
+        item.addEventListener('touchcancel', clearTouchDrag);
+
         // 標準拖拽事件（桌面設備）
         item.addEventListener('dragstart', function(e) {
+            e.dataTransfer.setData('text/plain', item.dataset.element);
+            e.dataTransfer.effectAllowed = 'copy';
             this.classList.add('dragging');
-            startAutoScrollCheck(e);
+            stopAutoScroll();
         });
         
         item.addEventListener('drag', function(e) {
             updateAutoScroll(e);
         });
         
-        item.addEventListener('dragend', function(e) {
+        item.addEventListener('dragend', function() {
+            designContainer.classList.remove('drag-over');
             this.classList.remove('dragging');
             stopAutoScroll();
         });
@@ -196,6 +218,7 @@ function initDragAndDrop() {
     // 為設計容器添加放置事件
     if (designContainer) {
         designContainer.addEventListener('dragover', function(e) {
+            e.dataTransfer.dropEffect = 'copy';
             e.preventDefault();
             this.classList.add('drag-over');
         });
@@ -207,59 +230,15 @@ function initDragAndDrop() {
         designContainer.addEventListener('drop', drop);
     }
     
-    // 開始檢查是否需要自動滾動
-    function startAutoScrollCheck(e) {
-        // 清除任何現有的滾動間隔
+    function updateAutoScroll({ clientY }) {
         stopAutoScroll();
-    }
-    
-    // 更新自動滾動
-    function updateAutoScroll(e) {
-        // 清除任何現有的滾動間隔
-        stopAutoScroll();
-        
-        // 獲取觸摸或鼠標位置
-        let clientY;
-        if (e.type.startsWith('touch')) {
-            clientY = e.touches[0].clientY;
-        } else {
-            clientY = e.clientY;
-        }
-        
-        // 獲取視口高度和設計容器位置
-        const viewportHeight = window.innerHeight;
-        const designContainerTop = designContainer.getBoundingClientRect().top;
-        const designContainerBottom = designContainer.getBoundingClientRect().bottom;
-        
-        // 設置滾動觸發區域大小（視口高度的20%）
-        const scrollTriggerSize = viewportHeight * 0.2;
-        
-        // 檢查是否在頂部觸發區域
-        if (clientY < scrollTriggerSize) {
-            // 向上滾動
-            autoScrollInterval = setInterval(() => {
-                window.scrollBy(0, -scrollSpeed);
-                
-                // 如果已經滾動到設計容器可見，停止滾動
-                if (designContainerBottom < 0) {
-                    stopAutoScroll();
-                }
-            }, 16);
-        } 
-        // 檢查是否在底部觸發區域
-        else if (clientY > viewportHeight - scrollTriggerSize) {
-            // 向下滾動
-            autoScrollInterval = setInterval(() => {
-                window.scrollBy(0, scrollSpeed);
-                
-                // 如果設計容器已經超出可視區域，停止滾動
-                if (designContainerTop > viewportHeight) {
-                    stopAutoScroll();
-                }
-            }, 16);
+        const edge = window.innerHeight * 0.2;
+        const direction = clientY < edge ? -1 : clientY > window.innerHeight - edge ? 1 : 0;
+        if (direction) {
+            autoScrollInterval = setInterval(() => window.scrollBy(0, direction * scrollSpeed), 16);
         }
     }
-    
+
     // 停止自動滾動
     function stopAutoScroll() {
         if (autoScrollInterval) {
@@ -268,30 +247,7 @@ function initDragAndDrop() {
         }
     }
     
-    // 模擬拖拽位置（用於觸摸事件）
-    function simulateDragPosition(e) {
-        const touch = e.touches[0];
-        // 獲取被拖動的元素
-        const draggedElement = document.querySelector('.dragging');
-        if (!draggedElement) return;
-        
-        // 模擬元素跟隨手指移動的視覺效果
-        // 這裡我們使用絕對定位讓元素跟隨手指
-        draggedElement.style.position = 'fixed';
-        draggedElement.style.zIndex = 1000;
-        draggedElement.style.top = (touch.clientY - 30) + 'px'; // 30px 是元素高度的一半，使元素中心在手指位置
-        draggedElement.style.left = (touch.clientX - 30) + 'px';
-        
-        // 更新design container的視覺效果
-        const designContainer = document.getElementById('designContainer');
-        const elementAtPoint = document.elementFromPoint(touch.clientX, touch.clientY);
-        
-        if (elementAtPoint && (elementAtPoint.id === 'designContainer' || elementAtPoint.closest('#designContainer'))) {
-            designContainer.classList.add('drag-over');
-        } else {
-            designContainer.classList.remove('drag-over');
-        }
-    }
+
 }
 
 /**
@@ -342,22 +298,6 @@ function handleElementDrop(elementName, flavorType, elementText) {
     setTimeout(() => {
         updateFlavorTipsForIdentity(elementName, elementText, flavorType);
     }, 150);
-    
-    // 恢復拖動元素的原狀（針對觸摸事件）
-    const draggedElement = document.querySelector('.dragging');
-    if (draggedElement) {
-        draggedElement.style.position = '';
-        draggedElement.style.zIndex = '';
-        draggedElement.style.top = '';
-        draggedElement.style.left = '';
-        draggedElement.classList.remove('dragging');
-    }
-    
-    // 移除design container的視覺效果
-    const designContainer = document.getElementById('designContainer');
-    if (designContainer) {
-        designContainer.classList.remove('drag-over');
-    }
     
     // 检查是否可以生成报告
     checkReportButtonStatus();
