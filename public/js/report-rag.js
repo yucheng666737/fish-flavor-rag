@@ -2,10 +2,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     let stored;
     try { stored = JSON.parse(localStorage.getItem('selectedElements') || '[]'); } catch { stored = []; }
-    const recipe = RecipeModel.calculate(stored);
     const identities = { pregnant: '孕婦', office: '上班族', elderly: '銀髮族', beauty: '美妝族群', fitness: '健身族', custom: '自由設計' };
     const chosen = localStorage.getItem('selectedIdentity');
     const identity = Object.hasOwn(identities, chosen) ? chosen : 'custom';
+    const recipe = RecipeModel.calculate(stored, identity);
+    if (!recipe.elements.length) { window.location.replace('flavor.html'); return; }
     document.getElementById('reportIdentity').textContent = identities[identity];
     document.getElementById('backToFlavor').addEventListener('click', () => { window.location.href = 'flavor.html'; });
     document.getElementById('finishExperience').addEventListener('click', () => { window.location.href = 'share.html'; });

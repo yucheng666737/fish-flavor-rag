@@ -95,7 +95,7 @@ async function ingest(config, provider, { dryRun = false } = {}, client = create
   }
   return publish(config, { corpusHash: corpus.hash, embeddingModel: config.embeddingModel, dimension: info.dimension, chunks }, client);
 }
-async function retrieve(config, provider, query, { sources } = {}, client = createPinecone(config)) {
+async function retrieve(config, provider, query, { sources, extractiveNutrition } = {}, client = createPinecone(config)) {
   const ctx = await context(config, client);
   await ready(config, client, ctx);
   const vectors = await provider.embed([query]);
@@ -103,7 +103,7 @@ async function retrieve(config, provider, query, { sources } = {}, client = crea
   if (!validVector(vector, ctx.dimension)) throw new AppError('INVALID_EMBEDDING', '查詢向量與 Pinecone 維度不符。');
   const filter = { kind: { $eq: 'chunk' }, model: { $eq: config.embeddingModel }, corpusHash: { $eq: ctx.corpus.hash } };
   if (sources) filter.source = { $in: sources };
-  const topK = sources ? Math.min(8, Math.max(config.topK, sources.length)) : config.topK;
+  const topK = sources ? Math.min(extractiveNutrition ? 11 : 8, Math.max(config.topK, sources.length)) : config.topK;
   const result = await client.post('/query', { namespace: ctx.namespace, vector, topK, includeMetadata: true, includeValues: false, filter });
   if (!Array.isArray(result.matches)) throw fail();
   const originals = new Map(ctx.corpus.chunks.map(c => [c.id, c]));

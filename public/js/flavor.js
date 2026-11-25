@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (clearAllButton) {
         clearAllButton.addEventListener('click', function() {
             if (window.additionalElements.length > 0) {
-                if (confirm('確定要清空所有已加入的風味成分嗎？(基底風味不會被清除)')) {
+                if (confirm('確定要清空所有已加入的風味成分嗎？')) {
                     clearAdditionalElements();
                 }
             }
@@ -89,38 +89,18 @@ document.addEventListener('DOMContentLoaded', function() {
  * 初始化风味元素
  */
 function initFlavorElements() {
-    // 初始化基底風味成分
-    window.baseElement = {
-        name: "fishessence",
-        display: "鱸魚精",
-        flavor: "濃郁",
-        isBase: true,
-        percentage: 50
-    };
-    
-    // 初始化額外添加的成分數組
+    const identity = localStorage.getItem('selectedIdentity') || 'custom';
+    const initial = RecipeModel.calculate([], identity);
+    window.baseElement = initial.elements[0] || null;
     window.additionalElements = [];
-    
-    // 初始化所有成分的總數組，包含基底和額外成分
-    window.selectedElements = [window.baseElement];
-    
-    // 初始化风味状态对象
-    window.flavorStats = {
-        freshness: 0,    // 清新感
-        richness: 6,     // 濃郁度 - 基底提供6分濃郁度
-        sweetness: 0,    // 甘甜度
-        naturalness: 3,  // 天然感 - 基底提供3分天然感
-        aftertaste: 5    // 後韻持久度 - 基底提供5分後韻持久度
-    };
+    window.selectedElements = initial.elements;
+    window.flavorStats = initial.stats;
+    const notice = document.querySelector('.base-flavor-notification');
+    notice.querySelector('h2').textContent = window.baseElement ? '基底風味：鱸魚精（50%）' : '自由設計';
+    notice.querySelector('p').textContent = window.baseElement ? '每添加一份風味增加 10%。' : '從空配方開始，拖入第一個風味。每份占 10%。';
+    document.querySelector('.bottle-liquid').classList.toggle('with-base', !!window.baseElement);
+    updateBottle();
 
-    // 初始化瓶身為基底顏色
-    const bottle = document.querySelector('.bottle-liquid');
-    if (bottle) {
-        bottle.style.height = '50%'; // 基底佔50%
-        bottle.style.backgroundColor = 'rgba(216, 174, 103, 1)'; // 淡黃色
-        bottle.classList.add('with-base');
-    }
-    
     // 更新進度條
     updateProgress();
     
@@ -255,8 +235,8 @@ function initDragAndDrop() {
  */
 function handleElementDrop(elementName, flavorType, elementText) {
     // 检查是否已达到最大额外成分比例（50%）
-    if (window.additionalElements.length >= 5) {
-        alert('您的配方中額外風味已達到最大比例50%，無法再添加更多成分。');
+    if (window.selectedElements.reduce((sum, item) => sum + item.percentage, 0) >= 100) {
+        alert('配方已達 100%，請先移除一份風味。');
         return;
     }
     
@@ -334,7 +314,7 @@ function updateBottle() {
         // 计算额外成分的高度百分比（每个成分10%）
         const additionalHeight = window.additionalElements.length * 10;
         // 基底50% + 额外成分高度
-        const totalHeight = 50 + additionalHeight;
+        const totalHeight = (window.baseElement?.percentage || 0) + additionalHeight;
         const height = totalHeight + '%';
         console.log('更新瓶身高度:', height);
         bottle.style.height = height;
@@ -531,13 +511,7 @@ function generateLabelText() {
 function updateFlavorStats(flavorType) {
     // 確保 flavorStats 對象存在
     if (!window.flavorStats) {
-        window.flavorStats = {
-            freshness: 0,
-            richness: 6,     // 基底提供6分濃郁度
-            sweetness: 0,
-            naturalness: 3,  // 基底提供3分天然感
-            aftertaste: 5    // 基底提供5分後韻持久度
-        };
+        window.flavorStats = RecipeModel.calculate([], window.baseElement ? 'preset' : 'custom').stats;
     }
     
     // 根據風味類型更新統計
@@ -573,7 +547,7 @@ function updateProgress() {
     if (!progressBar) return;
     
     // 计算当前完整度百分比 (基底50% + 额外成分)
-    const completenessPercentage = 50 + (window.additionalElements.length * 10);
+    const completenessPercentage = (window.baseElement?.percentage || 0) + (window.additionalElements.length * 10);
     progressBar.style.width = completenessPercentage + '%';
     progressBar.textContent = completenessPercentage + '%';
     
@@ -673,13 +647,13 @@ function updateFlavorDetails() {
     const flavorStatsContainer = document.getElementById('flavorStats');
     if (!flavorStatsContainer) return;
     
-    let statsHTML = `
+    let statsHTML = window.baseElement ? `
         <div class="flavor-item base-flavor">
             <span class="emoji-small">${getFlavorEmoji('fishessence')}</span>
             <span class="flavor-name">鱸魚精 (基底)</span>
             <span class="flavor-percentage">50%</span>
         </div>
-    `;
+    ` : '';
     
     // 添加额外成分
     window.additionalElements.forEach((element, index) => {
@@ -747,7 +721,7 @@ function checkReportButtonStatus() {
     if (!generateButton) return;
     
     // 只要有基底就可以生成報告
-    generateButton.disabled = false;
+    generateButton.disabled = window.selectedElements.length === 0;
 }
 
 /**
@@ -773,7 +747,7 @@ function deleteElement(e) {
     window.additionalElements.splice(index, 1);
     
     // 更新整體成分列表
-    window.selectedElements = [window.baseElement, ...window.additionalElements];
+    window.selectedElements = [window.baseElement, ...window.additionalElements].filter(Boolean);
     
     // 延遲更新視覺效果，讓動畫更流暢
     setTimeout(() => {
@@ -833,19 +807,13 @@ function decreaseFlavorStats(flavorType) {
  */
 function clearAdditionalElements() {
     // 重置風味統計到基底值
-    window.flavorStats = {
-        freshness: 0,    // 清新感
-        richness: 6,     // 濃郁度 - 基底提供6分濃郁度
-        sweetness: 0,    // 甘甜度
-        naturalness: 3,  // 天然感 - 基底提供3分天然感
-        aftertaste: 5    // 後韻持久度 - 基底提供5分後韻持久度
-    };
+    window.flavorStats = RecipeModel.calculate([], window.baseElement ? 'preset' : 'custom').stats;
     
     // 清空额外元素数组
     window.additionalElements = [];
     
     // 重置所有元素数组，只保留基底
-    window.selectedElements = [window.baseElement];
+    window.selectedElements = [window.baseElement].filter(Boolean);
     
     // 延遲更新視覺效果，讓動畫更流暢
     setTimeout(() => {
@@ -906,9 +874,12 @@ function updatePersonalizedTips(identity) {
     const container = document.getElementById('personalizedTips');
     if (!container) return;
     const heading = document.createElement('h3');
-    heading.textContent = '風味文件推薦（RAG）';
+    const picks = RecipeModel.recommendations[identity] || [];
+    heading.textContent = picks.length ? '身份推薦風味' : '自由搭配';
     const intro = document.createElement('p');
-    intro.textContent = '加入風味後，會檢索知識文件並顯示附來源的搭配建議。族群選擇不代表醫療或營養適用性。';
+    intro.textContent = picks.length
+        ? '推薦從' + picks.map(id => RecipeModel.ingredients[id][0]).join('、') + '開始，可從元素庫拖入喜歡的風味。'
+        : '從元素庫選擇喜歡的風味，開始設計自己的配方。';
     container.replaceChildren(heading, intro);
 }
 
@@ -923,7 +894,7 @@ function restoreRecipe() {
     catch { return; }
     if (!Array.isArray(stored)) return;
     const cards = new Map([...document.querySelectorAll('.element-item[data-element]')].map(el => [el.dataset.element, el]));
-    for (const item of stored.filter(el => el && !el.isBase).slice(0, 5)) {
+    for (const item of stored.filter(el => el && !el.isBase).slice(0, window.baseElement ? 5 : 10)) {
         const card = cards.get(item.name);
         if (!card) continue;
         const restored = { name: card.dataset.element, display: card.querySelector('span')?.textContent?.trim() || card.textContent.trim(), flavor: card.dataset.flavor, percentage: 10 };
@@ -934,4 +905,5 @@ function restoreRecipe() {
     updateBottle();
     updateProgress();
     updateFlavorDetails();
+    checkReportButtonStatus();
 }

@@ -12,8 +12,8 @@ function validateQuery(query) {
 function recommendationQuery(body) {
   if (!body || !IDENTITIES.has(body.identity)) throw new AppError('INVALID_IDENTITY', '請選擇有效的使用者族群。', 400);
   const elements = body.elements === undefined ? [body.elementName] : body.elements;
-  if (!Array.isArray(elements) || elements.length < 1 || elements.length > 6 || elements.some(e => typeof e !== 'string' || !Object.hasOwn(INGREDIENTS, e))) {
-    throw new AppError('INVALID_ELEMENTS', '請選擇 1 至 6 個支援的風味元素。', 400);
+  if (!Array.isArray(elements) || elements.length < 1 || elements.length > (body.identity === 'custom' ? 10 : 6) || elements.some(e => typeof e !== 'string' || !Object.hasOwn(INGREDIENTS, e))) {
+    throw new AppError('INVALID_ELEMENTS', '成分數量超出配方限制，或包含未知風味。', 400);
   }
   if (body.section !== undefined && !['flavor', 'nutrition', 'usage'].includes(body.section)) throw new AppError('INVALID_SECTION', '請選擇有效的報告區塊。', 400);
   const names = [...new Set(elements)].map(e => INGREDIENTS[e]).join('、');

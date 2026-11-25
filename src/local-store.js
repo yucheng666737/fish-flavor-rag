@@ -60,13 +60,13 @@ async function loadIndex(config) {
   if (data.corpusHash !== corpus.hash) throw new AppError('INDEX_STALE', '知識文件已變更，請重新執行 npm run ingest。');
   return data;
 }
-async function retrieve(config, provider, query, { sources } = {}) {
+async function retrieve(config, provider, query, { sources, extractiveNutrition } = {}) {
   const index = await loadIndex(config);
   const [vector] = await provider.embed([query]);
   if (!validVector(vector, index.dimension)) throw new AppError('INVALID_EMBEDDING', '查詢向量與索引維度不同，請檢查模型設定。');
   return index.chunks.filter(chunk => !sources || sources.includes(chunk.source))
     .map(({ vector: stored, ...chunk }) => ({ ...chunk, score: cosine(vector, stored) }))
     .filter(c => c.score >= config.minScore).sort((a, b) => b.score - a.score)
-    .slice(0, sources ? Math.min(8, Math.max(config.topK, sources.length)) : config.topK);
+    .slice(0, sources ? Math.min(extractiveNutrition ? 11 : 8, Math.max(config.topK, sources.length)) : config.topK);
 }
 module.exports = { ingest, loadIndex, retrieve, cosine, validVector };

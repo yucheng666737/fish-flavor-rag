@@ -23,10 +23,7 @@
         <p class="identity-info">您選擇的身份：<span id="selectedIdentity">未選擇</span></p>
         
         <!-- 新增基底風味提示 -->
-        <div class="base-flavor-notification">
-            <h2>基底風味: 鱸魚精 (50%)</h2>
-            <p>您可以再添加風味元素，總配方不超過100%</p>
-        </div>
+        <div class="base-flavor-notification"><h2></h2><p></p></div>
         
         <div class="flavor-content">
             <div class="design-area">
@@ -50,21 +47,14 @@
                         <div class="stat-bar">
                             <span>口感完整度：</span>
                             <div class="progress">
-                                <div id="completeness" style="width: 50%;">50%</div>
+                                <div id="completeness" style="width: 0%;">0%</div>
                             </div>
                         </div>
                         <div class="stats-header">
                             <h3>已選成分</h3>
                             <button id="clearAllElements" class="clear-btn" title="清空所有成分">清空所有</button>
                         </div>
-                        <div id="flavorStats" class="flavor-details">
-                            <!-- 這裡會動態填入調味成分資訊 --> 
-                            <div class="flavor-item base-flavor">
-                                <span class="flavor-name">鱸魚精 (基底)</span>
-                                <span class="flavor-percentage">50%</span>
-                                <!-- 基底風味不可刪除 -->
-                            </div>
-                        </div>
+                        <div id="flavorStats" class="flavor-details"></div>
                     </div>
                     <div id="personalizedTips" class="personalized-tips">
                         <!-- 這裡會顯示根據身份提供的個性化建議 -->
@@ -211,6 +201,7 @@
     </div>
     
     <script src="js/rag-client.js"></script>
+    <script src="js/recipe-model.js"></script>
     <script src="js/flavor.js"></script>
 </body>
 </html> 

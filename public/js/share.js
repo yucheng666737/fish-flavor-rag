@@ -2,8 +2,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // 從 localStorage 獲取數據
     const selectedIdentity = localStorage.getItem('selectedIdentity') || 'custom';
     const identityDisplayName = localStorage.getItem('identityDisplayName') || '自由設計';
-    const selectedElements = JSON.parse(localStorage.getItem('selectedElements') || '[]');
-    const flavorStats = JSON.parse(localStorage.getItem('flavorStats') || '{}');
+    const recipe = RecipeModel.calculate(JSON.parse(localStorage.getItem('selectedElements') || '[]'), selectedIdentity);
+    const selectedElements = recipe.elements;
+    if (!selectedElements.length) { window.location.replace('flavor.html'); return; }
+    const flavorStats = recipe.stats;
     
     // 初始化分享頁面
     initSharePage(selectedElements, flavorStats, selectedIdentity, identityDisplayName);
@@ -47,7 +49,7 @@ function updateBottlePreview(elements, flavorStats) {
     
     if (bottle) {
         // 設置滿瓶
-        bottle.style.height = '100%';
+        bottle.style.height = elements.reduce((sum, item) => sum + item.percentage, 0) + '%';
         
         // 如果沒有選擇元素，設置為白色
         if (!elements || elements.length === 0) {

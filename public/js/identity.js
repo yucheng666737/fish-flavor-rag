@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectedIdentity = this.getAttribute('data-identity');
             
             // 将选择保存到 localStorage 中
+            localStorage.removeItem('selectedElements');
+            localStorage.removeItem('flavorStats');
             localStorage.setItem('selectedIdentity', selectedIdentity);
             
             // 获取显示名称

@@ -57,3 +57,11 @@ test('share page has no recommendation panel or RAG client calls',()=>{
     assert.doesNotMatch(html,/aiRecommendation|文件檢索推薦|rag-client\.js/);
     assert.doesNotMatch(js,/RagClient|initAIRecommendation/);
 });
+
+test('custom recipes ignore the legacy fish base and can fill all ten slots', () => {
+    const legacy = [{ name: 'fishessence', isBase: true }, { name: 'mint' }];
+    assert.deepEqual(RecipeModel.calculate(legacy, 'custom').proportions, { '薄荷': 10, '未配置': 90 });
+    assert.deepEqual(Object.values(RecipeModel.calculate([], 'custom').stats), [0, 0, 0, 0, 0]);
+    assert.equal(RecipeModel.calculate(Array(10).fill({ name: 'mint' }), 'custom').filled, 100);
+    assert.equal(RecipeModel.calculate([], 'office').filled, 50);
+});
