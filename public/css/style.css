@@ -2818,3 +2818,48 @@ p, li, .subtitle, .guide-text, .card-back p, .flavor-details, .taste-description
         transform: rotate(360deg);
     }
 }
+@media (max-width: 768px) {
+    .flavor-content,
+    .share-preview,
+    .report-content {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    .action-buttons button {
+        flex: 1 1 12rem;
+        min-width: 0;
+    }
+
+    .share-message-content {
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 576px) {
+    .design-area, .elements-library, .report-section,
+    .share-content, .share-preview, .promotion-card {
+        padding: 1rem;
+    }
+
+    .code-container, .flavor-item {
+        flex-wrap: wrap;
+    }
+
+    .share-preview {
+        gap: 1rem;
+    }
+
+    .radar-chart-container, .nutrition-chart-container {
+        position: relative;
+        height: auto;
+        aspect-ratio: 1;
+    }
+
+    .radar-chart-container canvas, .nutrition-chart-container canvas {
+        max-width: 100%;
+    }
+}

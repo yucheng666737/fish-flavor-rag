@@ -15,7 +15,7 @@
 .rag-panel details, #personalizedTips details, #aiRecommendation details { margin: 12px 0; border: 1px solid #ebdfce; padding: 12px; border-radius: 8px; }
 .rag-panel summary, #personalizedTips summary, #aiRecommendation summary { cursor: pointer; font-weight: 600; }
 .rag-footnote, .rag-panel small { display: block; font-size: 13px; color: #716355; margin-top: 18px; }
-.rag-banner { margin: 12px auto; padding: 12px 18px; max-width: 1000px; background: #fff0d7; border-radius: 8px; line-height: 1.8; }
+.rag-banner { position: relative; z-index: 1; margin: 12px auto; padding: 12px 18px; max-width: 1000px; background: #fff0d7; border-radius: 8px; line-height: 1.8; }
 button:disabled { opacity: .55; cursor: wait; }
 .report-reference-note { color: #716355; line-height: 1.8; }
 .report-knowledge { box-shadow: none; margin-top: 16px; }
